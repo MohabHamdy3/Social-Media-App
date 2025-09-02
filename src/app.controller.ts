@@ -2,13 +2,12 @@ import { resolve } from 'path';
 import express, { NextFunction, Request, Response } from 'express';
 import { config } from 'dotenv';
 config({ path: resolve('./config/.env') });
-import cors from 'cors';
 import helmet from 'helmet';
 import {rateLimit} from 'express-rate-limit';
+import cors from 'cors';
 import { AppError } from './utils/classError';
 import userRouter from './modules/users/user.controller';
 const app : express.Application = express();
-
 const PORT : string | number = process.env.PORT || 4500;
 const limiter = rateLimit({
     windowMs: 5 * 60 * 1000, 
