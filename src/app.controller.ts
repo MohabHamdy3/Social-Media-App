@@ -7,6 +7,7 @@ import {rateLimit} from 'express-rate-limit';
 import cors from 'cors';
 import { AppError } from './utils/classError';
 import userRouter from './modules/users/user.controller';
+import connectionDB  from './DB/connectionDB';
 const app : express.Application = express();
 const PORT : string | number = process.env.PORT || 4500;
 const limiter = rateLimit({
@@ -16,7 +17,7 @@ const limiter = rateLimit({
     statusCode: 429,
     legacyHeaders: false
 });
-const bootstrap = () => {
+const bootstrap = async () => {
     app.use(express.json());
     app.use(cors());
     app.use(helmet());
@@ -24,7 +25,7 @@ const bootstrap = () => {
 
     app.use("/users" , userRouter)
 
-
+    await connectionDB();
     app.use("{/*demo}" , (req : Request, res : Response , next : NextFunction) => {
         throw new AppError(`invalid URL ${req.originalUrl}` , 404);
     });
