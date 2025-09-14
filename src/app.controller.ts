@@ -8,6 +8,8 @@ import cors from 'cors';
 import { AppError } from './utils/classError';
 import userRouter from './modules/users/user.controller';
 import connectionDB  from './DB/connectionDB';
+import { UserRepository } from './DB/repositories/user.repository';
+import userModel from './DB/model/user.model';
 const app : express.Application = express();
 const PORT : string | number = process.env.PORT || 4500;
 const limiter = rateLimit({
@@ -25,6 +27,13 @@ const bootstrap = async () => {
 
     app.use("/users" , userRouter)
 
+
+    // async function test() {
+    //     const _userModel = new UserRepository(userModel);
+    //     const user = await _userModel.findOne({ fName: "test", paranoid: false }, { age: 1, fName: 1 });
+    //     console.log(user);
+    // }
+    // test();
     await connectionDB();
     app.use("{/*demo}" , (req : Request, res : Response , next : NextFunction) => {
         throw new AppError(`invalid URL ${req.originalUrl}` , 404);

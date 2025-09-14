@@ -10,8 +10,20 @@ const userRouter = Router();
 userRouter.post("/signup", Validation(UV.signUpSchema), US.signUp);
 userRouter.patch("/confirmEmail", Validation(UV.confirmEmailSchema), US.confirmEmail);
 userRouter.post("/signin", Validation(UV.signInSchema), US.signIn);
+userRouter.post("/loginWithGmail", Validation(UV.loginWithGoogleSchema), US.loginWithGoogle);
 userRouter.get("/profile", Authentication(), US.getProfile);
 userRouter.post("/logout", Authentication(), Validation(UV.logoutSchema), US.logout);
 userRouter.get("/refreshToken", Authentication(TokenType.REFRESH), US.refreshToken);
+userRouter.post("/forgetPassword", Validation(UV.forgetPasswordSchema), US.forgetPassword);
+userRouter.patch("/resetPassword", Validation(UV.resetPasswordSchema), US.resetPassword);
+userRouter.patch("/updateProfile", Authentication(), Validation(UV.updateProfileSchema), US.updateProfile);
+userRouter.patch("/changePassword", Authentication(), Validation(UV.changePasswordSchema), US.changePassword);
+userRouter.patch("/updateEmail", Authentication(), Validation(UV.updateEmailSchema), US.updateEmail);
+userRouter.post("/confirmLogin", Validation(UV.confirmLoginSchema), US.confirmLogin);
+userRouter.post("/enableTwoStepVerification", Authentication(), US.enableTwoStepVerification);
+userRouter.post("/verifyTwoStepVerification", Authentication(), Validation(UV.verifyTwoStepVerificationSchema), US.verifyTwoStepVerification);
+userRouter.post("/disableTwoStepVerification", Authentication(), US.disableTwoStepVerification);
+
+
 export default userRouter;
 

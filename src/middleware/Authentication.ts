@@ -44,8 +44,8 @@ export const Authentication = (tokenType: TokenType = TokenType.ACCESS) => {
     //       cause: 401,
     //     });
     //   }
-    req.user = decoded?.user;
-    req.decoded = decoded?.decoded;
+    req.user = user;
+    req.decoded = decoded;
     return next();
   };
 };
