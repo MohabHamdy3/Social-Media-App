@@ -118,6 +118,12 @@ export const confirmLoginSchema = {
     }).required()
 }
 
+export const createUploadFilePresignerSchema = {
+    body: z.object({
+        originalname: z.string().min(3).max(100),
+        ContentType: z.string().min(5).max(50),
+    }).required()
+}
 export type SignUpSchemaType = z.infer<typeof signUpSchema.body>;
 export type ConfirmEmailSchemaType = z.infer<typeof confirmEmailSchema.body>;
 export type SignInSchemaType = z.infer<typeof signInSchema.body>;
@@ -130,3 +136,4 @@ export type changePasswordSchemaType = z.infer<typeof changePasswordSchema.body>
 export type updateEmailSchemaType = z.infer<typeof updateEmailSchema.body>;
 export type verifyTwoStepVerificationSchemaType = z.infer<typeof verifyTwoStepVerificationSchema.body>;
 export type confirmLoginSchemaType = z.infer<typeof confirmLoginSchema.body>;
+export type createUploadFilePresignerSchemaType = z.infer<typeof createUploadFilePresignerSchema.body>;

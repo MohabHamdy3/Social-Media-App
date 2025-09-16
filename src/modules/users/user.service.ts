@@ -6,6 +6,7 @@ import {
   changePasswordSchemaType,
   ConfirmEmailSchemaType,
   confirmLoginSchemaType,
+  createUploadFilePresignerSchemaType,
   FlagType,
   forgetPasswordSchemaType,
   loginWithGoogleSchemaType,
@@ -29,6 +30,8 @@ import { RevokeTokenRepository } from "../../DB/repositories/revokeToken.reposit
 import RevokeTokenModel from "../../DB/model/revokeToken.mode";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { v4 as uuidv4 } from "uuid";
+import { createUploadFilePresigner, uploadFile, uploadFiles } from "../../utils/s3.config";
+import { StorageEnum } from "../../middleware/multer.cloud";
 class UserService {
   private _userModel = new UserRepository(userModel);
   private _revokeTokenModel = new RevokeTokenRepository(RevokeTokenModel);
@@ -49,6 +52,8 @@ class UserService {
     this.enableTwoStepVerification = this.enableTwoStepVerification.bind(this);
     this.verifyTwoStepVerification = this.verifyTwoStepVerification.bind(this);
     this.disableTwoStepVerification = this.disableTwoStepVerification.bind(this); 
+    this.uploadProfileImage = this.uploadProfileImage.bind(this);
+    this.uploadCoverImages = this.uploadCoverImages.bind(this);
   }
 
   // ============ Sign Up ============ //
@@ -482,7 +487,43 @@ class UserService {
     return res.status(200).json({ message: "OTP sent to your new email. Please verify to complete the update.", status: 200 });
   }
 
-  
+  // ================= upload profile image  =================== //
+  async uploadProfileImage(req: Request, res: Response, next: NextFunction) {
+    // just change the function if i want to upload large file
+    const key = await uploadFile({
+      file: req.file!,
+      path: `users/${req.user?._id}`,
+      storeType: StorageEnum.disk
+    })
+
+  return res.status(200).json({ message: "Profile image uploaded successfully", key, status: 200 });
+  }
+
+  // ================= upload cover images  =================== //
+  async uploadCoverImages(req: Request, res: Response, next: NextFunction) {
+    const keys = await uploadFiles({
+      files: req.files as Express.Multer.File[],
+      path: `users/${req.user?._id}`,
+      storeType: StorageEnum.disk
+    });
+
+    return res.status(200).json({ message: "Cover images uploaded successfully", keys , status: 200 });
+  }
+
+  // ================= upload profile image (with presigner url)  =================== //
+  async uploadProfileImageWithPresigner(req: Request, res: Response, next: NextFunction) {
+    const { originalname, ContentType } : createUploadFilePresignerSchemaType = req.body;
+    if (!originalname || !ContentType) {
+      return next(new AppError("originalname and ContentType are required", 400));
+    }
+    const signedUrl = await createUploadFilePresigner({
+      originalname,
+      ContentType,
+      path: `users/${req.user?._id}`
+    });
+
+    return res.status(200).json({ message: "Profile image uploaded successfully", signedUrl, status: 200 });
+   }
 
 }
 

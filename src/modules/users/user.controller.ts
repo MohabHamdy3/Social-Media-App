@@ -4,6 +4,8 @@ import US from "./user.service";
 import * as UV from "./user.validation";
 import { Authentication } from "../../middleware/Authentication";
 import { TokenType } from "../../utils/token";
+import { fileValidator, multerCloud, StorageEnum } from "../../middleware/multer.cloud";
+import { createUploadFilePresigner } from './../../utils/s3.config';
 
 const userRouter = Router();
 
@@ -23,7 +25,8 @@ userRouter.post("/confirmLogin", Validation(UV.confirmLoginSchema), US.confirmLo
 userRouter.post("/enableTwoStepVerification", Authentication(), US.enableTwoStepVerification);
 userRouter.post("/verifyTwoStepVerification", Authentication(), Validation(UV.verifyTwoStepVerificationSchema), US.verifyTwoStepVerification);
 userRouter.post("/disableTwoStepVerification", Authentication(), US.disableTwoStepVerification);
-
-
+userRouter.post("/uploadProfileImage", multerCloud({ fileTypes: fileValidator.image, storageType: StorageEnum.disk }).single("profileImage"), Authentication(), US.uploadProfileImage);
+userRouter.post("/uploadCoverImages", multerCloud({ fileTypes: fileValidator.image, storageType: StorageEnum.cloud }).array("coverImages", 5), Authentication(), US.uploadCoverImages);
+userRouter.get("/createUploadFilePresigner", Authentication(), Validation(UV.createUploadFilePresignerSchema), US.uploadProfileImageWithPresigner);
 export default userRouter;
 
