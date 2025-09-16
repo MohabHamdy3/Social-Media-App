@@ -27,6 +27,11 @@ export interface IUser {
     image?: string;
     gender: GenderType;
     role?: RoleType;
+    bio?: string;
+    followers?: string[];
+    following?: string[];
+    profileImage?: string;
+    coverImages?: string[];
     provider?: ProviderType;
     twoStepEnabled?: boolean;
     otp?: string;
@@ -50,7 +55,12 @@ const userSchema = new mongoose.Schema<IUser>({
     image: { type: String, trim: true },
     gender: { type: String, enum: Object.values(GenderType), required: true },
     role: { type: String, enum: Object.values(RoleType), default: RoleType.User },
+    bio: { type: String, trim: true },
     provider: { type: String, enum: Object.values(ProviderType), default: ProviderType.Local },
+    followers: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    following: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }],
+    profileImage: { type: String, trim: true },
+    coverImages: { type: [String], trim: true },
     twoStepEnabled: { type: Boolean, default: false },
     otp: { type: String },
     otpExpireAt: { type: Date },

@@ -57,6 +57,9 @@ class UserService {
     this.uploadProfileImageWithPresigner = this.uploadProfileImageWithPresigner.bind(this);
     this.deactivateAccount = this.deactivateAccount.bind(this);
     this.reactivateAccount = this.reactivateAccount.bind(this);
+    this.getUserProfile = this.getUserProfile.bind(this);
+    this.followUser = this.followUser.bind(this);
+    this.unfollowUser = this.unfollowUser.bind(this);
   }
 
   // ============ Sign Up ============ //
@@ -549,6 +552,67 @@ class UserService {
     return res.status(200).json({ message: "Account activated successfully", status: 200 });
   }
 
+    // ================= get user profile  =================== //
+  async getUserProfile(req: Request, res: Response, next: NextFunction) {
+    const userId = req.params.id;
+    const user = await this._userModel.findById(userId!, { password: 0 , isActive: 0 , otp: 0 , confirmed: 0 , changeCredentials: 0  });
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+    return res.status(200).json({ message: "User profile fetched successfully", user });
+  }
+
+  // ================= follow user  =================== //
+  async followUser(req: Request, res: Response, next: NextFunction) {
+    const targetUserId = req.params.id;
+    const userId = req.user?._id;
+    if (!userId) {
+      return next(new AppError("Unauthorized , Please login again", 404));
+    }
+    if(userId.toString() === targetUserId) {
+      return next(new AppError("You cannot follow yourself", 400));
+    }
+    const user = await this._userModel.findById(userId!, { following: 1 });
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+    const targetUser = await this._userModel.findById(targetUserId!, { followers: 1 });
+    
+    if (!targetUser) {
+      return next(new AppError("Target user not found", 404));
+    }
+    if (user?.following?.includes(targetUserId!)) {
+      return next(new AppError("You are already following this user", 400));
+    }
+    await this._userModel.updateOne({ _id: userId }, { $push: { following: targetUserId } });
+    await this._userModel.updateOne({ _id: targetUserId }, { $push: { followers: userId } });
+    return res.status(200).json({ message: "User followed successfully", status: 200 });
+  }
+
+  // ================= unfollow user  =================== //
+  async unfollowUser(req: Request, res: Response, next: NextFunction) {
+    const targetUserId = req.params.id;
+    const userId = req.user?._id;
+    if (!userId) {
+      return next(new AppError("Unauthorized , Please login again", 404));
+    }
+    const user = await this._userModel.findById(userId!, { following: 1 });
+    if (!user) {
+      return next(new AppError("User not found", 404));
+    }
+    const targetUser = await this._userModel.findById(targetUserId!, { followers: 1 });
+    if (!targetUser) {
+      return next(new AppError("Target user not found", 404));
+    }
+    if (!user?.following?.includes(targetUserId!)) {
+      return next(new AppError("You are not following this user", 400));
+    }
+    await this._userModel.updateOne({ _id: userId }, { $pull: { following: targetUserId } });
+    await this._userModel.updateOne({ _id: targetUserId }, { $pull: { followers: userId } });
+    return res.status(200).json({ message: "User unfollowed successfully", status: 200 });
+  }
+
+ 
 }
 
 export default new UserService();

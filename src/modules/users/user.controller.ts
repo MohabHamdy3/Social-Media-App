@@ -30,5 +30,13 @@ userRouter.post("/uploadCoverImages", multerCloud({ fileTypes: fileValidator.ima
 userRouter.get("/createUploadFilePresigner", Authentication(), Validation(UV.createUploadFilePresignerSchema), US.uploadProfileImageWithPresigner);
 userRouter.patch("/deactivateAccount", Authentication(), US.deactivateAccount);
 userRouter.patch("/reactivateAccount", US.reactivateAccount); // this is not authenticated because it is only for admin to reactivate account so that the user can't reactivate their account again with expired token
+userRouter.get("/:id", Authentication(), US.getUserProfile);
+userRouter.post("/followUser/:id", Authentication(), US.followUser);
+userRouter.post("/unfollowUser/:id", Authentication(), US.unfollowUser);
+
+
+
+
+
 export default userRouter;
 

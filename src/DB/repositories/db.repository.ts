@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, ProjectionType, RootFilterQuery, UpdateQuery } from "mongoose";
+import { HydratedDocument, Model, ProjectionType, RootFilterQuery, Types, UpdateQuery } from "mongoose";
 import { AppError } from "../../utils/classError";
 
 
@@ -15,6 +15,9 @@ export abstract class DBRepository<TDocument> {
 
     async updateOne(filter: RootFilterQuery<TDocument>, update: UpdateQuery<TDocument>): Promise<HydratedDocument<TDocument> | null> {
         return this.model.findOneAndUpdate(filter, update);
+    }
+    async findById(id: Types.ObjectId | string, select : ProjectionType<TDocument>): Promise<HydratedDocument<TDocument> | null> {
+        return this.model.findById(id).select(select);
     }
    
 } 
