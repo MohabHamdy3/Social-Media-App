@@ -28,5 +28,7 @@ userRouter.post("/disableTwoStepVerification", Authentication(), US.disableTwoSt
 userRouter.post("/uploadProfileImage", multerCloud({ fileTypes: fileValidator.image, storageType: StorageEnum.disk }).single("profileImage"), Authentication(), US.uploadProfileImage);
 userRouter.post("/uploadCoverImages", multerCloud({ fileTypes: fileValidator.image, storageType: StorageEnum.cloud }).array("coverImages", 5), Authentication(), US.uploadCoverImages);
 userRouter.get("/createUploadFilePresigner", Authentication(), Validation(UV.createUploadFilePresignerSchema), US.uploadProfileImageWithPresigner);
+userRouter.patch("/deactivateAccount", Authentication(), US.deactivateAccount);
+userRouter.patch("/reactivateAccount", US.reactivateAccount); // this is not authenticated because it is only for admin to reactivate account so that the user can't reactivate their account again with expired token
 export default userRouter;
 

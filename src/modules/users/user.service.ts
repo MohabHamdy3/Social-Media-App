@@ -54,6 +54,9 @@ class UserService {
     this.disableTwoStepVerification = this.disableTwoStepVerification.bind(this); 
     this.uploadProfileImage = this.uploadProfileImage.bind(this);
     this.uploadCoverImages = this.uploadCoverImages.bind(this);
+    this.uploadProfileImageWithPresigner = this.uploadProfileImageWithPresigner.bind(this);
+    this.deactivateAccount = this.deactivateAccount.bind(this);
+    this.reactivateAccount = this.reactivateAccount.bind(this);
   }
 
   // ============ Sign Up ============ //
@@ -132,6 +135,9 @@ class UserService {
     }
     if (!user.confirmed) {
       return next(new AppError("Please confirm your email first", 400));
+    }
+    if (user.isActive === false) {
+      return next(new AppError("Your account is deactivated , Please reactive it first", 400));
     }
     if (user.twoStepEnabled) {
     // generate OTP and send email
@@ -523,7 +529,25 @@ class UserService {
     });
 
     return res.status(200).json({ message: "Profile image uploaded successfully", signedUrl, status: 200 });
-   }
+  }
+  
+  // ================= deactivate the account  =================== //
+  async deactivateAccount(req: Request, res: Response, next: NextFunction) {
+    if(!req.user?._id) {
+      return next(new AppError("Unauthorized , Please login again", 404));
+    }
+    await this._userModel.updateOne({ _id: req.user?._id }, { isActive: false });
+    return res.status(200).json({ message: "Account deactivated successfully", status: 200 });
+  }
+
+  // ================= activate the account  =================== //
+  async reactivateAccount(req: Request, res: Response, next: NextFunction) {
+    if(!req.user?._id) {
+      return next(new AppError("Unauthorized , Please login again", 404));
+    }
+    await this._userModel.updateOne({ _id: req.user?._id }, { isActive: true });
+    return res.status(200).json({ message: "Account activated successfully", status: 200 });
+  }
 
 }
 

@@ -33,6 +33,7 @@ export interface IUser {
     otpExpireAt?: Date;
     confirmed?: boolean;
     deletedAt: Date;
+    isActive: boolean;
     changeCredentials?: Date;
     createdAt: Date;
     updatedAt: Date;
@@ -55,6 +56,7 @@ const userSchema = new mongoose.Schema<IUser>({
     otpExpireAt: { type: Date },
     confirmed: { type: Boolean, default: false },
     deletedAt: { type: Date, default: null },
+    isActive: { type: Boolean, default: true },
     changeCredentials: { type: Date }
 }, {
     timestamps: true,
